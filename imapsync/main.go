@@ -5,14 +5,16 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
-	"imap"
 	"io"
 	"log"
 	"os"
+	"taliesinb/go-imap"
 	"time"
 )
 
 var dumpProtocol *bool = flag.Bool("dumpprotocol", false, "dump imap stream")
+var username string
+var password string
 
 func check(err error) {
 	if err != nil {
@@ -71,7 +73,9 @@ func readExtra(im *imap.IMAP) {
 }
 
 func (ui *UI) connect(useNetmon bool) *imap.IMAP {
-	user, pass := loadAuth("auth")
+	//user, pass := loadAuth("auth")
+	user := username
+	pass := password
 
 	ui.log("connecting...")
 	conn, err := tls.Dial("tcp", "imap.gmail.com:993", nil)
@@ -184,7 +188,7 @@ func (ui *UI) reportOnStatus() {
 		}
 	}
 	fmt.Printf("\n")
-}	
+}
 
 func (ui *UI) runFetch(mailbox string) {
 	ui.statusChan = make(chan interface{})
@@ -216,14 +220,13 @@ func (ui *UI) runList() {
 	}()
 
 	ui.reportOnStatus()
-}	
-
+}
 
 func usage() {
 	fmt.Printf("usage: %s command\n", os.Args[0])
 	fmt.Printf("commands are:\n")
-	fmt.Printf("  list   list mailboxes\n")
-	fmt.Printf("  fetch  download mailbox\n")
+	fmt.Printf("  list user pass 	list mailboxes\n")
+	fmt.Printf("  fetch user pass 	download mailbox\n")
 	os.Exit(0)
 }
 
@@ -232,11 +235,13 @@ func main() {
 	flag.Parse()
 
 	args := flag.Args()
-	if len(args) < 1 {
+	if len(args) < 3 {
 		usage()
 	}
 	mode := args[0]
-	args = args[1:]
+	username = args[1]
+	password = args[2]
+	args = args[3:]
 
 	ui := new(UI)
 
