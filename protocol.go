@@ -2,8 +2,8 @@ package imap
 
 import (
 	"errors"
-	"strconv"
 	"fmt"
+	"strconv"
 )
 
 // Status represents server status codes which are returned by
@@ -303,8 +303,8 @@ func (r *reader) readFLAGS() *ResponseFlags {
 // ResponseFetchEnvelope contains the broken-down message metadata
 // retrieved when fetching the ENVELOPE data of a message.
 type ResponseFetchEnvelope struct {
-	date, subject, inReplyTo, messageId *string
-	from, sender, replyTo, to, cc, bcc  []Address
+	Date, Subject, InReplyTo, MessageId *string
+	From, Sender, ReplyTo, To, Cc, Bcc  []Address
 }
 
 // ResponseFetch contains the message data from a FETCH message.
@@ -333,16 +333,16 @@ func (r *reader) readFETCH(num int) *ResponseFetch {
 			if len(env) != 10 {
 				panic(fmt.Sprintf("envelope needed 10 fields, had %d", len(env)))
 			}
-			fetch.Envelope.date = nilOrString(env[0])
-			fetch.Envelope.subject = nilOrString(env[1])
-			fetch.Envelope.from = addressListFromSexp(env[2])
-			fetch.Envelope.sender = addressListFromSexp(env[3])
-			fetch.Envelope.replyTo = addressListFromSexp(env[4])
-			fetch.Envelope.to = addressListFromSexp(env[5])
-			fetch.Envelope.cc = addressListFromSexp(env[6])
-			fetch.Envelope.bcc = addressListFromSexp(env[7])
-			fetch.Envelope.inReplyTo = nilOrString(env[8])
-			fetch.Envelope.messageId = nilOrString(env[9])
+			fetch.Envelope.Date = nilOrString(env[0])
+			fetch.Envelope.Subject = nilOrString(env[1])
+			fetch.Envelope.From = addressListFromSexp(env[2])
+			fetch.Envelope.Sender = addressListFromSexp(env[3])
+			fetch.Envelope.ReplyTo = addressListFromSexp(env[4])
+			fetch.Envelope.To = addressListFromSexp(env[5])
+			fetch.Envelope.Cc = addressListFromSexp(env[6])
+			fetch.Envelope.Bcc = addressListFromSexp(env[7])
+			fetch.Envelope.InReplyTo = nilOrString(env[8])
+			fetch.Envelope.MessageId = nilOrString(env[9])
 		case "FLAGS":
 			fetch.Flags = s[i+1]
 		case "INTERNALDATE":

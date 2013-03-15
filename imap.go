@@ -30,8 +30,8 @@ type IMAP struct {
 
 func New(r io.Reader, w io.Writer) *IMAP {
 	return &IMAP{
-		r:       &reader{newParser(r)},
-		w:       w,
+		r: &reader{newParser(r)},
+		w: w,
 	}
 }
 
@@ -287,21 +287,21 @@ func (imap *IMAP) readLoop() error {
 }
 
 type Address struct {
-	name, source, address string
+	Name, Source, Address string
 }
 
 func (a *Address) fromSexp(s []sexp) {
 	if name := nilOrString(s[0]); name != nil {
-		a.name = *name
+		a.Name = *name
 	}
 	if source := nilOrString(s[1]); source != nil {
-		a.source = *source
+		a.Source = *source
 	}
 	mbox := nilOrString(s[2])
 	host := nilOrString(s[3])
 	if mbox != nil && host != nil {
 		address := *mbox + "@" + *host
-		a.address = address
+		a.Address = address
 	}
 }
 func addressListFromSexp(s sexp) []Address {
