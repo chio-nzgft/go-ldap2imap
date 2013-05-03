@@ -28,14 +28,14 @@ func (s Status) String() string {
 // message.  (Messages of the form "OK [CODE HERE] ..." are parsed
 // as specific other response types, like ResponseUIDValidity.)
 type ResponseStatus struct {
-	status Status
-	code   interface{}
-	text   string
-	extra  []interface{}
+	Status Status
+	Code   interface{}
+	Text   string
+	Extra  []interface{}
 }
 
 func (r *ResponseStatus) String() string {
-	return fmt.Sprintf("%s [%s] %s", r.status, r.code, r.text)
+	return fmt.Sprintf("%s [%s] %s", r.Status, r.Code, r.Text)
 }
 
 // IMAPError is an error returned for IMAP-level errors, such
@@ -418,15 +418,15 @@ func (r *reader) readUntagged() (resp interface{}, outErr error) {
 	case "OK", "NO", "BAD":
 		resp, err := r.readStatus(command)
 		check(err)
-		if resp.code == nil {
+		if resp.Code == nil {
 			return resp, nil
 		}
-		switch resp.code.(type) {
+		switch resp.Code.(type) {
 		case string:
 			// XXX write a parser for this code type.
 			return resp, nil
 		default:
-			return resp.code, nil
+			return resp.Code, nil
 		}
 	}
 

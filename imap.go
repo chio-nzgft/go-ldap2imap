@@ -44,8 +44,8 @@ func (imap *IMAP) Start() (string, error) {
 		return "", fmt.Errorf("expected untagged server hello. got %q", tag)
 	}
 	resp := r.(*ResponseStatus)
-	if resp.status != OK {
-		return "", &IMAPError{resp.status, resp.text}
+	if resp.Status != OK {
+		return "", &IMAPError{resp.Status, resp.Text}
 	}
 
 	go func() {
@@ -54,7 +54,7 @@ func (imap *IMAP) Start() (string, error) {
 		panic(err)
 	}()
 
-	return resp.text, nil
+	return resp.Text, nil
 }
 
 func (imap *IMAP) Send(ch chan interface{}, format string, args ...interface{}) error {
@@ -96,11 +96,11 @@ L:
 	}
 
 	if len(extra) > 0 {
-		response.extra = extra
+		response.Extra = extra
 	}
 	// XXX callers discard unsolicited responses if this is not OK
-	if response.status != OK {
-		return response, &IMAPError{response.status, response.text}
+	if response.Status != OK {
+		return response, &IMAPError{response.Status, response.Text}
 	}
 	return response, nil
 }
@@ -112,7 +112,7 @@ func (imap *IMAP) Auth(user string, pass string) (string, []string, error) {
 	}
 
 	var caps []string
-	for _, extra := range resp.extra {
+	for _, extra := range resp.Extra {
 		switch extra := extra.(type) {
 		case *ResponseCapabilities:
 			caps = extra.Capabilities
@@ -120,7 +120,7 @@ func (imap *IMAP) Auth(user string, pass string) (string, []string, error) {
 			imap.Unsolicited <- extra
 		}
 	}
-	return resp.text, caps, nil
+	return resp.Text, caps, nil
 }
 
 func (imap *IMAP) Idle() (chan interface{}, error) {
@@ -150,7 +150,7 @@ func (imap *IMAP) List(reference string, name string) ([]*ResponseList, error) {
 	}
 
 	lists := make([]*ResponseList, 0)
-	for _, extra := range response.extra {
+	for _, extra := range response.Extra {
 		if list, ok := extra.(*ResponseList); ok {
 			lists = append(lists, list)
 		} else {
@@ -184,7 +184,7 @@ func (imap *IMAP) Examine(mailbox string) (*ResponseExamine, error) {
 
 	r := &ResponseExamine{}
 
-	for _, extra := range resp.extra {
+	for _, extra := range resp.Extra {
 		switch extra := extra.(type) {
 		case (*ResponseFlags):
 			r.Flags = extra.Flags
@@ -225,7 +225,7 @@ func (imap *IMAP) Fetch(sequence string, fields []string) ([]*ResponseFetch, err
 	}
 
 	lists := make([]*ResponseFetch, 0)
-	for _, extra := range resp.extra {
+	for _, extra := range resp.Extra {
 		if list, ok := extra.(*ResponseFetch); ok {
 			lists = append(lists, list)
 		} else {
