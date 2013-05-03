@@ -130,6 +130,11 @@ func (imap *IMAP) Idle() (chan interface{}, error) {
 	return ch, err
 }
 
+func (imap *IMAP) Done() (error) {
+	_, err := imap.w.Write([]byte("DONE\r\n"))
+	return err
+}
+
 func quote(in string) string {
 	if strings.IndexAny(in, "\r\n") >= 0 {
 		panic("invalid characters in string to quote")
