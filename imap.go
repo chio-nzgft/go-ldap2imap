@@ -1,6 +1,7 @@
 package imap
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -94,7 +95,7 @@ L:
 	for {
 		r, open := <-ch
 		if !open {
-			return nil, "read failure"
+			return nil, errors.New("read failure")
 		}
 
 		switch r := r.(type) {
