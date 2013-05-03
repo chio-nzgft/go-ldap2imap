@@ -49,9 +49,16 @@ func (imap *IMAP) Start() (string, error) {
 	}
 
 	go func() {
-		err := imap.readLoop()
-		// XXX what to do with an error on the read thread?
-		panic(err)
+		defer func() {
+			if err := recover(); err != nil {
+				imap.pendingLock.Lock()
+				imap.pendingTag = 0
+				close(imap.pendingChan)
+				imap.pendingLock.Unlock()
+			}
+		}()
+
+		imap.readLoop()
 	}()
 
 	return resp.Text, nil
@@ -85,7 +92,11 @@ func (imap *IMAP) SendSync(format string, args ...interface{}) (*ResponseStatus,
 	extra := make([]interface{}, 0)
 L:
 	for {
-		r := <-ch
+		r, open := <-ch
+		if !open {
+			return nil, "read failure"
+		}
+
 		switch r := r.(type) {
 		case *ResponseStatus:
 			response = r
