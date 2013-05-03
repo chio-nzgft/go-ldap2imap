@@ -123,6 +123,13 @@ func (imap *IMAP) Auth(user string, pass string) (string, []string, error) {
 	return resp.text, caps, nil
 }
 
+func (imap *IMAP) Idle() (chan interface{}, error) {
+	ch := make(chan interface{})
+	err := imap.Send(ch, "IDLE")
+
+	return ch, err
+}
+
 func quote(in string) string {
 	if strings.IndexAny(in, "\r\n") >= 0 {
 		panic("invalid characters in string to quote")

@@ -57,6 +57,7 @@ const (
 type tag int
 
 const untagged = tag(-1)
+const continuation = tag(-2)
 
 type reader struct {
 	*parser
@@ -75,6 +76,13 @@ func (r *reader) readResponse() (tag, interface{}, error) {
 			return untagged, nil, err
 		}
 		return tag, resp, nil
+	} else if tag == continuation {
+		resp, err := r.readContinuation()
+		if err != nil {
+			return untagged, nil, err
+		}
+
+		return untagged, resp, nil
 	} else {
 		resp, err := r.readStatus("")
 		if err != nil {
@@ -87,7 +95,7 @@ func (r *reader) readResponse() (tag, interface{}, error) {
 }
 
 // Read the tag, the first part of the response.
-// Expects either "*" or "a123".
+// Expects either "*", "+" or "a123".
 func (r *reader) readTag() (tag, error) {
 	str, err := r.readToken()
 	if err != nil {
@@ -98,6 +106,8 @@ func (r *reader) readTag() (tag, error) {
 	}
 
 	switch str[0] {
+	case '+':
+		return continuation, nil;
 	case '*':
 		return untagged, nil
 	case 'a':
@@ -371,6 +381,17 @@ type ResponseExists struct {
 // flag set.
 type ResponseRecent struct {
 	Count int
+}
+
+type ResponseContinuation struct {
+	text string
+}
+
+func (r *reader) readContinuation() (resp interface{}, outErr error) {
+	rest, err := r.readToEOL()
+	check(err)
+
+	return &ResponseContinuation{rest}, nil
 }
 
 func (r *reader) readUntagged() (resp interface{}, outErr error) {
