@@ -135,6 +135,22 @@ func (imap *IMAP) Auth(user string, pass string) (string, []string, error) {
 	return resp.Text, caps, nil
 }
 
+func (imap *IMAP) Capability() ([]string, error) {
+	resp, err := imap.SendSync("CAPABILITY")
+	if err != nil {
+		return nil, err
+	}
+
+	for _, extra := range resp.Extra {
+		switch extra := extra.(type) {
+		case *ResponseCapabilities:
+			return extra.Capabilities, nil
+		}
+	}
+
+	panic("Didn't get CAPABILITY reply from the server!")
+}
+
 func (imap *IMAP) Idle() (chan interface{}, error) {
 	ch := make(chan interface{})
 	err := imap.Send(ch, "IDLE")
