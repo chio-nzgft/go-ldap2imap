@@ -183,17 +183,17 @@ func (r *reader) readStatus(statusStr string) (resp *ResponseStatus, outErr erro
 			flags, err := r.readParenStringList()
 			check(err)
 			code = &ResponsePermanentFlags{flags}
-			check(r.expect("]"))
+			check(r.expect("] "))
 		case "UIDVALIDITY":
 			num, err := r.readNumber()
 			check(err)
 			code = &ResponseUIDValidity{num}
-			check(r.expect("]"))
+			check(r.expect("] "))
 		case "UIDNEXT":
 			num, err := r.readNumber()
 			check(err)
 			code = &ResponseUIDNext{num}
-			check(r.expect("]"))
+			check(r.expect("] "))
 		default:
 			text, err := r.ReadString(']')
 			check(err)
@@ -215,8 +215,6 @@ func (r *reader) readStatus(statusStr string) (resp *ResponseStatus, outErr erro
 		 "UNSEEN" SP nz-number /
 		 atom [SP 1*<any TEXT-CHAR except "]">]
 		*/
-
-		check(r.expect(" "))
 	}
 
 	rest, err := r.readToEOL()
