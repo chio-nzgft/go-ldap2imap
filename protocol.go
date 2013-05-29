@@ -375,6 +375,11 @@ type ResponseExists struct {
 	Count int
 }
 
+// ResponseExpunge contains the sequence number of a deleted message.
+type ResponseExpunge struct {
+	SeqNum int
+}
+
 // ResponseRecent contains the number of messages with the recent
 // flag set.
 type ResponseRecent struct {
@@ -442,6 +447,9 @@ func (r *reader) readUntagged() (resp interface{}, outErr error) {
 			return &ResponseRecent{num}, nil
 		case "FETCH":
 			return r.readFETCH(num), nil
+		case "EXPUNGE":
+			check(r.expectEOL())
+			return &ResponseExpunge{num}, nil
 		}
 	}
 
