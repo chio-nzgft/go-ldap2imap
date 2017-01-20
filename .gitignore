@@ -1,8 +1,0 @@
-*.6
-_obj
-_test*
-6.out
-*.a
-auth
-*.mbox
-bin/*
